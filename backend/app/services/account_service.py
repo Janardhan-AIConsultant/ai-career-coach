@@ -39,6 +39,7 @@ from app.models import (
     LearningModule,
     LearningRoadmap,
     Message,
+    ModerationLog,
     Portfolio,
     PortfolioAchievement,
     ProjectEvaluation,
@@ -47,6 +48,7 @@ from app.models import (
     Resume,
     SkillGapAnalysis,
     Testimonial,
+    TestimonialShareEvent,
     User,
     UserProfile,
     UserSession,
@@ -116,6 +118,9 @@ def delete_account(
     db.execute(delete(Conversation).where(Conversation.user_id == user.id))
     for owned in (SkillGapAnalysis, CareerAnalysis, Resume, JobDescription, Report, Document):
         db.execute(delete(owned).where(owned.owner_user_id == user.id))
+    t_ids = select(Testimonial.id).where(Testimonial.user_id == user.id)
+    db.execute(delete(TestimonialShareEvent).where(TestimonialShareEvent.testimonial_id.in_(t_ids)))
+    db.execute(delete(ModerationLog).where(ModerationLog.testimonial_id.in_(t_ids)))
     for by_user in (Feedback, Testimonial, UserProfile, UserSession):
         db.execute(delete(by_user).where(by_user.user_id == user.id))
     now = datetime.now(UTC)

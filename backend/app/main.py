@@ -21,6 +21,7 @@ from app.api.routes import (
     auth,
     certificates,
     coach,
+    feedback,
     guest,
     health,
     interview,
@@ -118,6 +119,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(projects.router, prefix="/api/v1")
     app.include_router(certificates.router, prefix="/api/v1")
     app.include_router(portfolio.router, prefix="/api/v1")
+    app.include_router(feedback.router, prefix="/api/v1")
     app.include_router(admin.router, prefix="/api/v1")
     app.include_router(workspace.build_workspace_router(workspace.user_ctx), prefix="/api/v1")
     return app
