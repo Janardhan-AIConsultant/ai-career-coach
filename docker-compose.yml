@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: career
+      POSTGRES_PASSWORD: career   # local development only
+      POSTGRES_DB: career_coach
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U career"]
+      interval: 5s
+      retries: 10
+  chroma:
+    image: chromadb/chroma:latest
+    volumes: [chromadata:/data]
+  backend:
+    build: ./backend
+    env_file: [backend/.env]
+    environment:
+      DATABASE_URL: postgresql+psycopg://career:career@postgres:5432/career_coach
+      CHROMA_HOST: chroma
+      CORS_ORIGINS: http://localhost:5173
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      chroma: {condition: service_started}
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    ports: ["5173:5173"]
+    depends_on: [backend]
+volumes:
+  pgdata:
+  chromadata:

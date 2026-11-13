@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+node_modules/
+dist/
+logs/*.log*
+chroma_db/
+storage/
+npm_*.log
+npm_done.flag

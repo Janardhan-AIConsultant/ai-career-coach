@@ -1,0 +1,23 @@
+Role: Generative AI Engineer
+
+Responsibilities:
+- Build RAG applications using LangChain, vector databases and LLMs.
+- Develop prompt engineering workflows for business use cases.
+- Work with Python, FastAPI, Streamlit and cloud deployment.
+- Evaluate LLM outputs and improve retrieval quality.
+- Build AI agents using tool calling and memory.
+
+Required Skills:
+- Python programming
+- Generative AI and LLM fundamentals
+- LangChain
+- RAG, embeddings, vector databases
+- Prompt engineering
+- API development
+- Git and deployment basics
+
+Preferred Skills:
+- LangGraph
+- AWS Bedrock or Azure OpenAI
+- Docker
+- SQL
