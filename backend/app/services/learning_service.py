@@ -38,6 +38,7 @@ from app.schemas.learning import (
 from app.services import report_builders as rb
 from app.services.career_service import CareerService
 from app.services.object_storage import ObjectStorage
+from app.services.portfolio_service import touch_portfolio
 from app.services.principal import Principal
 from app.services.report_render import render
 from app.services.report_service import create_report
@@ -239,6 +240,7 @@ class LearningService:
             r.status, r.completed_at = "completed", datetime.now(UTC)
         elif not progress.criteria_met and r.status == "completed":
             r.status, r.completed_at = "in_progress", None
+        touch_portfolio(self._db, r.user_id)  # keep the portfolio in step with roadmap completion
 
     def on_assessment_passed(self, slug: str) -> int:
         """Complete matching assessment activities in the user's in-progress roadmaps."""
@@ -261,6 +263,8 @@ class LearningService:
 
     def delete(self, roadmap_id: uuid.UUID) -> None:
         self._roadmap(roadmap_id).deleted_at = datetime.now(UTC)
+        self._db.flush()
+        touch_portfolio(self._db, self._user.id)
         self._db.commit()
 
     # ------------------------------------------------------------ dashboard and reports

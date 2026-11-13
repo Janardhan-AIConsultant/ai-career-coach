@@ -46,6 +46,7 @@ from app.schemas.certificates import (
 )
 from app.services.certificate_pdf import CertificateData, render_certificate
 from app.services.learning_service import LearningService
+from app.services.portfolio_service import touch_portfolio
 
 _ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"  # Crockford base32 (no I, L, O, U)
 CODE_RE = re.compile(r"^ACC-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$")
@@ -180,6 +181,8 @@ class CertificateService:
         self._db.add(AuditLog(actor_user_id=self._user.id, action="certificate.issued", entity_type="certificate",
                               entity_id=cert.certificate_code, details={"type": certificate_type}))
         try:
+            self._db.flush()
+            touch_portfolio(self._db, self._user.id)
             self._db.commit()
         except IntegrityError as exc:  # concurrent duplicate request or code collision
             self._db.rollback()
@@ -230,6 +233,8 @@ class CertificateService:
         c.status, c.revoked_at, c.revoked_reason = "revoked", datetime.now(UTC), reason.strip()
         self._db.add(AuditLog(actor_user_id=admin.id, action="certificate.revoked", entity_type="certificate",
                               entity_id=c.certificate_code, details={"type": c.certificate_type}))
+        self._db.flush()
+        touch_portfolio(self._db, c.user_id)
         self._db.commit()
         return certificate_out(c, self._s.frontend_url)
 

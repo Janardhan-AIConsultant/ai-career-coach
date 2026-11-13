@@ -156,3 +156,13 @@ ASSESSMENTS: list[dict[str, Any]] = [
      ]},
 ]
 BY_SLUG = {a["slug"]: a for a in ASSESSMENTS}
+
+# Skills each assessment evidences (used by the portfolio); skill names match the taxonomy.
+ASSESSMENT_SKILLS = {
+    "python-fundamentals": ["python"],
+    "kafka-essentials": ["kafka"],
+    "postgresql-essentials": ["postgresql"],
+    "rag-genai": ["rag", "generative ai", "llm", "embeddings"],
+    "architecture-essentials": ["microservices", "distributed systems", "system design"],
+    "engineering-leadership": ["mentoring", "team management", "delivery management"],
+}

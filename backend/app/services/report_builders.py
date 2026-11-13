@@ -112,3 +112,28 @@ def roadmap_doc(r) -> ReportDoc:  # type: ignore[no-untyped-def]
             [*[f"Objective: {o}" for o in m.objectives],
              *[f"Day {a.day_number} [{a.kind}] {a.title} ({a.estimated_minutes} min)" for a in m.activities]]))
     return ReportDoc(r.title, "Platform learning plan; completion is verified by assessments, not by this document.", sections)
+
+
+def portfolio_doc(p) -> ReportDoc:  # type: ignore[no-untyped-def]
+    """Owner's portfolio (``PortfolioOut``): learning evidence only."""
+    s = p.stats
+    overview = (
+        f"{s.learning_paths_completed} learning plan(s) completed, {s.activities_completed} activities "
+        f"(about {s.estimated_learning_hours:g} study hours), {s.assessments_passed} assessment(s) passed, "
+        f"{s.certificates} certificate(s), {s.projects_passed} project(s) reviewed."
+    )
+    sections = [Section("Overview", [overview])]
+    if p.skills:
+        sections.append(Section("Skill evidence", table=[["Skill", "Evidence level", "Based on"]] + [
+            [k.skill, k.highest.replace("demonstrated", "practically demonstrated"),
+             "; ".join(sorted({e["kind"].replace("_", " ") for e in k.evidence}))] for k in p.skills]))
+    visible = [i for i in p.timeline if i.is_visible]
+    sections.append(Section("Achievement timeline", bullets=[
+        f"{i.achieved_at:%Y-%m-%d} [{i.kind.replace('_', ' ')} / {i.evidence_level}] {i.title}" for i in visible] or ["No achievements yet"]))
+    certs = [i for i in visible if i.kind == "certificate"]
+    if certs:
+        sections.append(Section("Certificates", bullets=[f"{i.title} - ID {i.details['certificate_id']} - {i.details['verification_url']}" for i in certs]))
+    projects = [i for i in visible if i.kind == "project"]
+    if projects:
+        sections.append(Section("Projects", bullets=[f"{i.title}" + (f" - {i.details['repo_url']}" if i.details.get("repo_url") else "") for i in projects]))
+    return ReportDoc("Career Achievement Portfolio", p.disclaimer, sections)

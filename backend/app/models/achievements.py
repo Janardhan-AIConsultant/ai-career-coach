@@ -84,6 +84,9 @@ class Portfolio(IdMixin, TimestampMixin, SoftDeleteMixin, Base):
 
     user_id: Mapped[uuid.UUID] = fk("users.id", unique=True)
     visibility: Mapped[str] = mapped_column(String(20), default="private")
+    display_name: Mapped[str | None] = mapped_column(String(120))  # public name chosen by the owner
+    headline: Mapped[str | None] = mapped_column(String(200))
+    consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))  # explicit public consent
     public_slug: Mapped[str | None] = mapped_column(String(80), unique=True)
     summary: Mapped[str | None] = mapped_column(Text)
     section_visibility: Mapped[dict[str, Any] | None] = mapped_column(JsonType)
@@ -96,6 +99,7 @@ class PortfolioAchievement(IdMixin, TimestampMixin, Base):
     __tablename__ = "portfolio_achievements"
     __table_args__ = (
         in_check("evidence_level", EVIDENCE_LEVELS, "ck_portfolio_achievements_evidence"),
+        UniqueConstraint("portfolio_id", "source_type", "source_id", name="uq_portfolio_source"),
     )
 
     portfolio_id: Mapped[uuid.UUID] = fk("portfolios.id")
@@ -106,4 +110,5 @@ class PortfolioAchievement(IdMixin, TimestampMixin, Base):
     source_type: Mapped[str | None] = mapped_column(String(30))
     source_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=True)
+    details: Mapped[dict[str, Any] | None] = mapped_column(JsonType)
     achieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

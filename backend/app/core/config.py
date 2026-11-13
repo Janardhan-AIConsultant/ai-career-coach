@@ -72,6 +72,7 @@ class Settings(BaseSettings):
     max_projects_per_user: int = Field(20, ge=1)
     certificates_per_day: int = Field(20, ge=1)
     verify_requests_per_minute: int = Field(60, ge=1)
+    portfolio_requests_per_minute: int = Field(60, ge=1)
 
     # RAG
     chunk_size: int = Field(800, ge=100)

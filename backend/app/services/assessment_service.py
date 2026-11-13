@@ -27,6 +27,7 @@ from app.schemas.learning import (
     SubmitOut,
 )
 from app.services.learning_service import LearningService
+from app.services.portfolio_service import touch_portfolio
 
 MAX_ATTEMPTS_PER_DAY = 5
 MAX_ANSWER_CHARS = 5000
@@ -130,6 +131,8 @@ class AssessmentService:
         self._db.add(attempt)
         self._db.flush()
         completed = self._learning.on_assessment_passed(slug) if passed else 0
+        if passed:
+            touch_portfolio(self._db, self._user.id)  # automatic portfolio update
         self._db.commit()
         return SubmitOut(attempt_id=attempt.id, slug=slug, score=score, passed=passed, pass_score=a.pass_score,
                          results=results, roadmap_activities_completed=completed)

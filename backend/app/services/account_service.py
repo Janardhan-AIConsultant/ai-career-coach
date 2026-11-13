@@ -39,6 +39,8 @@ from app.models import (
     LearningModule,
     LearningRoadmap,
     Message,
+    Portfolio,
+    PortfolioAchievement,
     ProjectEvaluation,
     ProjectSubmission,
     Report,
@@ -95,6 +97,9 @@ def delete_account(
     sess_ids = select(InterviewSession.id).where(InterviewSession.user_id == user.id)
     db.execute(delete(InterviewAnswer).where(InterviewAnswer.session_id.in_(sess_ids)))
     db.execute(delete(InterviewSession).where(InterviewSession.user_id == user.id))
+    pf_ids = select(Portfolio.id).where(Portfolio.user_id == user.id)
+    db.execute(delete(PortfolioAchievement).where(PortfolioAchievement.portfolio_id.in_(pf_ids)))
+    db.execute(delete(Portfolio).where(Portfolio.user_id == user.id))
     # certificates reference their evidence, so they go first (right to erasure: the ID then verifies as invalid)
     db.execute(delete(Certificate).where(Certificate.user_id == user.id))
     sub_ids = select(ProjectSubmission.id).where(ProjectSubmission.user_id == user.id)

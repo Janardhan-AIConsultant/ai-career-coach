@@ -32,6 +32,7 @@ from app.schemas.projects import (
     TemplateOut,
 )
 from app.services.career_service import CareerService
+from app.services.portfolio_service import touch_portfolio
 from app.services.principal import Principal
 from app.workflows.career_graph import build_career_graph
 
@@ -168,10 +169,14 @@ class ProjectService:
         sub.status = "passed" if result.passed else "needs_work"
         self._db.add(AuditLog(actor_user_id=self._user.id, action="project.evaluated", entity_type="project_submission",
                               entity_id=str(sub.id), details={"passed": result.passed, "score": result.overall_score}))
+        self._db.flush()
+        touch_portfolio(self._db, self._user.id)
         self._db.commit()
         return self._out(sub)
 
     def delete(self, submission_id: uuid.UUID) -> None:
         sub = self._get(submission_id)
         sub.deleted_at = datetime.now(UTC)
+        self._db.flush()
+        touch_portfolio(self._db, self._user.id)
         self._db.commit()
