@@ -1,0 +1,51 @@
+# Render Blueprint: the API only (frontend on Vercel, database on Neon, vectors on Chroma Cloud).
+# Secrets are never stored here: every `sync: false` value is entered in the Render dashboard.
+services:
+  - type: web
+    name: ai-career-coach-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free            # 512 MB RAM, sleeps after idle (cold starts), ephemeral disk. See docs/deployment.md.
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_FORMAT
+        value: json
+      - key: LOG_TO_FILE
+        value: "false"
+      - key: DATABASE_URL            # Neon, e.g. postgresql+psycopg://<USER>:<PASSWORD>@<HOST>/<DB>?sslmode=require
+        sync: false
+      - key: JWT_SECRET_KEY          # python -c "import secrets;print(secrets.token_urlsafe(48))"
+        sync: false
+      - key: FRONTEND_URL            # https://YOUR-APP.vercel.app
+        sync: false
+      - key: CORS_ORIGINS            # same value as FRONTEND_URL (exact origin, no trailing slash)
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: llama-3.1-8b-instant
+      - key: CHROMA_API_KEY
+        sync: false
+      - key: CHROMA_TENANT
+        sync: false
+      - key: CHROMA_DATABASE
+        sync: false
+      - key: EMBEDDING_PROVIDER      # "hash" is lexical-only; see docs/deployment.md before choosing
+        value: hash
+      - key: OBJECT_STORAGE_BACKEND  # "local" loses generated files on every restart
+        value: local
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false

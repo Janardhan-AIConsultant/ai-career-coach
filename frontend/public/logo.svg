@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AI Career Coach logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="0.6" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M44 44A17 17 0 1 1 44 20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M23 40L30 33L35 37L46 25" fill="none" stroke="#fbbf24" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 24.5H46.5V31" fill="none" stroke="#fbbf24" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="50" cy="14" r="2.2" fill="#fff" opacity="0.9"/>
+</svg>

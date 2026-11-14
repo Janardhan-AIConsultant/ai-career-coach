@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-slate-50 text-slate-900 antialiased; }
+  :focus-visible { @apply outline-none ring-2 ring-indigo-400; }
+}
+
+@keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.fade-in { animation: fade-in 0.5s ease-out; }
+@media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }

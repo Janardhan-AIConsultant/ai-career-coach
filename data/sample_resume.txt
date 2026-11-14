@@ -1,0 +1,16 @@
+Name: Candidate
+
+Summary:
+Python developer with experience in data analysis, machine learning basics and Streamlit applications. Built projects in pandas, scikit-learn and basic NLP.
+
+Skills:
+Python, Pandas, NumPy, Machine Learning, Streamlit, SQL, Git
+
+Projects:
+1. Customer Review Sentiment Analysis using Python and ML.
+2. Sales Dashboard using Streamlit and Pandas.
+3. Basic Chatbot using rule-based Python logic.
+
+Experience:
+Intern - Data Science
+Worked on data cleaning, visualization and simple ML models.

@@ -1,0 +1,4 @@
+# Optional: local semantic embeddings (heavy: pulls PyTorch). Not for small free-tier hosts.
+-r requirements.txt
+langchain-huggingface>=0.1
+sentence-transformers>=3
