@@ -8,6 +8,8 @@ roadmaps with assessments, certificates, a career achievement portfolio, and tes
 LangChain/LangGraph - Groq (optional) - ChromaDB - Docker Compose. Target hosting: Vercel, Render, Neon,
 Chroma Cloud (see [docs/deployment.md](docs/deployment.md)).
 
+![Application flow: request path, data stores and user journeys](docs/images/application_flow.png)
+
 ## What you can do
 **Without an account (guest session, auto-deleted on expiry):** resume analysis, job description analysis,
 resume/job match, skill gap analysis, resume optimisation, with PDF/DOCX reports.
