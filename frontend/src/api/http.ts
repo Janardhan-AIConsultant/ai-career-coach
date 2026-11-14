@@ -1,8 +1,11 @@
 // Single place for backend access. Only VITE_API_BASE_URL is exposed to the browser.
 import { useSession } from "../store/session";
 
+// Set VITE_API_BASE_URL to "" in production to call same-origin /api/... (proxied by the host's rewrite).
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
-const API = `${API_BASE_URL}/api/v1`;
+/** Versioned API root. Trailing slashes are ignored, so VITE_API_BASE_URL="/" means same-origin /api/v1. */
+export const API_ROOT = `${API_BASE_URL.replace(/\/+$/, "")}/api/v1`;
+const API = API_ROOT;
 
 export class ApiError extends Error {
   constructor(
@@ -70,7 +73,7 @@ async function toError(res: Response): Promise<ApiError> {
 }
 
 function url(path: string, query?: RequestOptions["query"]): string {
-  const u = new URL(`${API}${path}`);
+  const u = new URL(`${API}${path}`, window.location.origin); // API may be a same-origin path (Vercel rewrite)
   for (const [k, v] of Object.entries(query ?? {})) if (v !== undefined && v !== null && v !== "") u.searchParams.set(k, String(v));
   return u.toString();
 }

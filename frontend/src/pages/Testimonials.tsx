@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { API_BASE_URL, messageOf, request } from "../api/http";
+import { API_ROOT, messageOf, request } from "../api/http";
 import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls } from "../components/ui";
 import { FEEDBACK_FEATURES, PLATFORM_LABEL, SHARE_PLATFORMS, type SharePlatform } from "../lib/constants";
 import { useSession } from "../store/session";
@@ -14,7 +14,7 @@ interface Mine {
 interface Share { public_url: string; share_text: string; links: Record<SharePlatform, string>; note: string }
 
 const stars = (n: number | null) => (n ? "★".repeat(n) + "☆".repeat(5 - n) : "");
-const cardUrl = (id: string) => `${API_BASE_URL}/api/v1/testimonials/public/${id}/card.png`;
+const cardUrl = (id: string) => `${API_ROOT}/testimonials/public/${id}/card.png`;
 const record = (id: string, event_type: string, platform?: SharePlatform) =>
   request(`/testimonials/public/${id}/events`, { json: { event_type, platform }, auth: "none" }).catch(() => undefined);
 

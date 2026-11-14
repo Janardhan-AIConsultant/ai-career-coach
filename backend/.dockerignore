@@ -1,0 +1,13 @@
+.venv
+__pycache__
+*.pyc
+.env
+.env.*
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+tests
+logs
+storage
+chroma_db

@@ -88,3 +88,66 @@ def test_s3_backend_fails_fast_instead_of_using_disk() -> None:
     s = Settings(_env_file=None, object_storage_backend="s3")  # type: ignore[call-arg]
     with pytest.raises(ConfigurationError):
         create_object_storage(s)
+
+
+class _FakeS3:
+    """Just enough of the boto3 S3 client; raises a botocore-shaped error for missing keys."""
+
+    class ClientError(Exception):
+        def __init__(self, code: str) -> None:
+            self.response = {"Error": {"Code": code}}
+
+    def __init__(self) -> None:
+        self.objects: dict[tuple[str, str], bytes] = {}
+
+    def put_object(self, Bucket: str, Key: str, Body: bytes) -> None:
+        self.objects[(Bucket, Key)] = Body
+
+    def get_object(self, Bucket: str, Key: str) -> dict:  # type: ignore[type-arg]
+        import io
+        if (Bucket, Key) not in self.objects:
+            raise self.ClientError("NoSuchKey")
+        return {"Body": io.BytesIO(self.objects[(Bucket, Key)])}
+
+    def delete_object(self, Bucket: str, Key: str) -> None:
+        self.objects.pop((Bucket, Key), None)
+
+
+def test_s3_storage_round_trip_prefix_and_missing_key() -> None:
+    from app.services.object_storage import S3ObjectStorage
+    fake = _FakeS3()
+    s = S3ObjectStorage("bkt", fake, prefix="reports/")
+    s.put("a/b.pdf", b"data")
+    assert fake.objects == {("bkt", "reports/a/b.pdf"): b"data"}
+    assert s.get("a/b.pdf") == b"data"
+    s.delete("a/b.pdf")
+    s.delete("a/b.pdf")  # idempotent
+    with pytest.raises(NotFoundError):
+        s.get("a/b.pdf")
+
+
+def test_s3_storage_rejects_unsafe_keys_and_propagates_other_errors() -> None:
+    from app.services.object_storage import S3ObjectStorage
+    s = S3ObjectStorage("bkt", _FakeS3())
+    for bad in ("../x", "a/../b", "/abs", "", "a b"):
+        with pytest.raises(ValueError):
+            s.put(bad, b"x")
+
+    class Broken(_FakeS3):
+        def get_object(self, Bucket: str, Key: str) -> dict:  # type: ignore[type-arg]
+            raise self.ClientError("AccessDenied")
+
+    with pytest.raises(Exception) as exc:
+        S3ObjectStorage("bkt", Broken()).get("k")
+    assert not isinstance(exc.value, NotFoundError)
+
+
+def test_s3_factory_needs_complete_configuration_and_builds_a_client() -> None:
+    from app.services.object_storage import S3ObjectStorage
+    base = {"_env_file": None, "object_storage_backend": "s3"}
+    for partial in ({}, {"s3_bucket": "b"}, {"s3_bucket": "b", "s3_access_key_id": "k"}):
+        with pytest.raises(ConfigurationError):
+            create_object_storage(Settings(**base, **partial))  # type: ignore[arg-type]
+    full = Settings(**base, s3_bucket="b", s3_access_key_id="k", s3_secret_access_key="s",  # type: ignore[arg-type]
+                    s3_endpoint_url="https://example.invalid", s3_region="auto")
+    assert isinstance(create_object_storage(full), S3ObjectStorage)

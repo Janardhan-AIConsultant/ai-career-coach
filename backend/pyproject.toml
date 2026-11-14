@@ -17,7 +17,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 
 [[tool.mypy.overrides]]
-module = ["pymupdf.*", "langchain_huggingface.*", "groq.*", "chromadb.*", "docx.*"]
+module = ["pymupdf.*", "langchain_huggingface.*", "groq.*", "chromadb.*", "docx.*", "boto3.*", "botocore.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

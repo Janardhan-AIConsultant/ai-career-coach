@@ -100,6 +100,12 @@ class Settings(BaseSettings):
     # Object storage abstraction
     object_storage_backend: Literal["local", "s3"] = "local"
     object_storage_path: str = "storage"
+    # S3-compatible storage (OBJECT_STORAGE_BACKEND=s3): AWS S3, Cloudflare R2, Backblaze B2, MinIO
+    s3_bucket: str = ""
+    s3_endpoint_url: str = ""  # empty for AWS S3; the provider's endpoint for R2/B2/MinIO
+    s3_region: str = ""
+    s3_access_key_id: SecretStr = SecretStr("")
+    s3_secret_access_key: SecretStr = SecretStr("")
 
     @model_validator(mode="after")
     def _validate(self) -> Settings:

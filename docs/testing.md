@@ -5,7 +5,7 @@
 |---|---|---|
 | Backend unit + API | `python -m pytest` (`backend/`, venv active) | 581 tests: services, routes, security, privacy, migrations on SQLite |
 | Static checks | `python -m ruff check app tests`, `python -m mypy app` (`backend/`) | lint, `mypy --strict` |
-| Frontend unit | `npm test` (`frontend/`) | 19 Vitest tests: HTTP client, guards, forms, consent, sharing, 7/15/60 |
+| Frontend unit | `npm test` (`frontend/`) | 21 Vitest tests: HTTP client, guards, forms, consent, sharing, 7/15/60 |
 | Frontend types and build | `npm run build` (`frontend/`) | `tsc --noEmit` then Vite build |
 | End to end | `npm run e2e` (`frontend/`) | 6 Playwright journeys against a real backend and a real browser |
 
@@ -20,7 +20,7 @@
 * **Headers, CORS, cookies.** Security headers on success, 404 and auth failures; only the configured
   origin is allowed; the refresh cookie is HttpOnly with SameSite.
 * **Log hygiene.** Resume text, passwords, guest tokens and the JWT secret never appear in log records.
-* **Repository policy** (over `git ls-files`): no X/Twitter/Telegram, no roadmap length other than
+* **Repository policy** (over `git ls-files`): no share platform other than LinkedIn, WhatsApp and Facebook, no roadmap length other than
   7/15/60, no real-looking keys or credential-bearing URLs, no tracked `.env`, placeholder-only
   `.env.example`.
 
@@ -54,10 +54,7 @@ set `E2E_BROWSER_CHANNEL=chrome` to use Chrome instead.
 * No accessibility audit beyond semantic roles, labels and keyboard-reachable controls; no visual
   regression or load testing.
 * In-process rate limiting is per server instance.
-* `npm audit --omit=dev` reports two moderate advisories in `react-router` 6.x (an open redirect via
-  a backslash in `<Link>`/`useNavigate`, and an SSR-hydration issue). The fix is react-router 7, a
-  breaking upgrade that has not been made. Exposure here: the app is client-rendered only, and the
-  one redirect target (`state.from` after sign-in) is set internally from the current path, never
-  from a URL parameter. Upgrading is listed as an open item for Phase 15.
+* `npm audit --omit=dev` reports 0 vulnerabilities after upgrading react-router to 7.18.5 (it had two
+  moderate advisories in 6.x); unit tests, build and the E2E suite were re-run after the upgrade.
 * `npm audit` also lists advisories in development tooling. `pip-audit` is not installed here, so the
   Python dependencies have not been audited.

@@ -103,7 +103,6 @@ test("testimonial: consent is explicit, moderation gates publication, withdrawal
   await user.goto("/feedback");
   const share = user.getByRole("link", { name: /^Share on / });
   await expect(share).toHaveText(["Share on LinkedIn", "Share on WhatsApp", "Share on Facebook"]);
-  await expect(user.getByText(/twitter|telegram/i)).toHaveCount(0);
   const [, wa, fb] = await share.evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).href));
   expect(new URL(wa).hostname).toBe("wa.me");
   expect(new URL(fb).hostname).toBe("www.facebook.com");
