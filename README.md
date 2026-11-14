@@ -10,6 +10,8 @@ roadmaps with assessments, certificates, a career achievement portfolio, and tes
 LangChain/LangGraph - Groq (optional) - ChromaDB - Docker Compose. Target hosting: Vercel, Render, Neon,
 Chroma Cloud (see [docs/deployment.md](docs/deployment.md)).
 
+![AI Career Coach: what the platform does, with its tech stack and test results](docs/images/ai-career-coach-showcase-4k.png)
+
 ![Application flow: request path, data stores and user journeys](docs/images/application_flow.png)
 
 ## What you can do
