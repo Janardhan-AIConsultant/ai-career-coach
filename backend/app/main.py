@@ -10,11 +10,13 @@ from __future__ import annotations
 import logging
 import uuid
 from collections.abc import Awaitable, Callable
+from http import HTTPStatus
 
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.routes import (
     admin,
@@ -86,6 +88,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             status_code=exc.status_code,
             content={"error": {"code": exc.code, "message": exc.message}},
         )
+
+    @app.exception_handler(StarletteHTTPException)
+    async def http_error(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+        """Framework-level errors (unknown route, wrong method) use the same envelope as AppError."""
+        try:
+            phrase = HTTPStatus(exc.status_code).phrase
+        except ValueError:
+            phrase = "Error"
+        return JSONResponse(
+            status_code=exc.status_code, headers=getattr(exc, "headers", None),
+            content={"error": {"code": phrase.lower().replace(" ", "_"), "message": phrase}})
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:

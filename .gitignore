@@ -13,3 +13,7 @@ chroma_db/
 storage/
 npm_*.log
 npm_done.flag
+
+e2e/.run/
+test-results/
+playwright-report/
