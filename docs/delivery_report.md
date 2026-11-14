@@ -9,7 +9,7 @@ it was **run** or only **written**. Nothing is claimed that was not executed.
 | Backend tests (`python -m pytest --cov=app`) | **584 passed**, 97% coverage of about 6,200 statements (about 3 minutes) |
 | `ruff check app tests` | clean |
 | `mypy app` (strict) | no issues in 106 source files |
-| Frontend unit tests (Vitest) | **21 passed** (run after the react-router 7 upgrade) |
+| Frontend unit tests (Vitest) | **24 passed** (run after the react-router 7 upgrade) |
 | Frontend `npm run build` (tsc + Vite) | succeeds |
 | End to end (Playwright, installed Edge, real backend, SQLite) | **6 passed** (run after the react-router 7 upgrade) |
 | `npm audit --omit=dev` | 0 vulnerabilities |

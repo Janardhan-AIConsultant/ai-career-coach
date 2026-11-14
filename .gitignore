@@ -17,3 +17,6 @@ npm_done.flag
 frontend/e2e/.run/
 test-results/
 playwright-report/
+
+backend/local_dev.db
+*_dev.log

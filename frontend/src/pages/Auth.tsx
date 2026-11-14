@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { request, messageOf } from "../api/http";
+import { AuthShell } from "../components/AuthShell";
 import { Button, Card, ErrorBox, Field, inputCls } from "../components/ui";
 import { useSession, type User } from "../store/session";
 
@@ -34,8 +35,8 @@ export function Login() {
     }
   };
   return (
-    <Card title="Sign in">
-      <form onSubmit={submit} className="max-w-sm">
+    <AuthShell headline="Pick up where your career growth left off" points={["Your roadmaps and progress, saved","Certificates you can share and verify","A coach that knows your skill gaps"]}><Card title="Welcome back" subtitle="Sign in to continue your learning" icon="🔐">
+      <form onSubmit={submit}>
         <ErrorBox error={error} />
         <Field label="Email">
           <input className={inputCls} type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -48,7 +49,7 @@ export function Login() {
           No account? <Link className="text-blue-700 underline" to="/register">Register</Link>
         </p>
       </form>
-    </Card>
+    </Card></AuthShell>
   );
 }
 
@@ -78,8 +79,8 @@ export function Register() {
     }
   };
   return (
-    <Card title="Create your account">
-      <form onSubmit={submit} className="max-w-sm">
+    <AuthShell headline="Turn your next job into a plan" points={["Match score and skill gaps in minutes","7, 15 or 60 day learning roadmaps","Assessments and platform-issued certificates"]}><Card title="Create your account" subtitle="Free. Keep your history, roadmaps and certificates." icon="🚀">
+      <form onSubmit={submit}>
         <ErrorBox error={error} />
         <Field label="Display name">
           <input className={inputCls} required maxLength={120} value={name} onChange={(e) => setName(e.target.value)} />
@@ -91,7 +92,10 @@ export function Register() {
           <input className={inputCls} type="password" required minLength={10} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Field>
         <Button type="submit" busy={busy}>Create account</Button>
+        <p className="mt-3 text-sm">
+          Already registered? <Link className="text-blue-700 underline" to="/login">Sign in</Link>
+        </p>
       </form>
-    </Card>
+    </Card></AuthShell>
   );
 }

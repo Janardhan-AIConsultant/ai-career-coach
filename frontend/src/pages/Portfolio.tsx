@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls, PageHeader } from "../components/ui";
 
 interface Item { id: string; kind: string; title: string; evidence_level: string; skills: string[]; achieved_at: string; is_visible: boolean }
 interface Settings {
@@ -37,7 +37,7 @@ export function PortfolioPage() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-bold">Career achievement portfolio</h1>
+      <PageHeader title="Career achievement portfolio" />
       <Notice>{p.disclaimer}</Notice>
       <ErrorBox error={err ? messageOf(err) : null} />
       <Card title="Sharing">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, Spinner, inputCls, PageHeader } from "../components/ui";
 
 interface Summary { slug: string; title: string; topic: string; difficulty: string; pass_score: number; question_count: number; attempts: number; best_score: number | null }
 interface Question { id: string; type: string; prompt: string; options: string[] | null; points: number }
@@ -17,7 +17,7 @@ export default function Assessments() {
   if (slug) return <Take slug={slug} onDone={() => setSlug(null)} />;
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">Assessments</h1>
+      <PageHeader title="Assessments" />
       {list.isLoading && <Spinner />}
       <ErrorBox error={list.error ? messageOf(list.error) : null} />
       <div className="grid gap-3 md:grid-cols-2">

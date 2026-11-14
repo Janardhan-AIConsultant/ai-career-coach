@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_ROOT, messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls, PageHeader } from "../components/ui";
 import { FEEDBACK_FEATURES, PLATFORM_LABEL, SHARE_PLATFORMS, type SharePlatform } from "../lib/constants";
 import { useSession } from "../store/session";
 
@@ -59,7 +59,7 @@ export function PublicTestimonials() {
   const q = useQuery({ queryKey: ["pubt"], queryFn: () => request<PublicT[]>("/testimonials/public", { auth: "none" }) });
   return (
     <>
-      <h1 className="mb-2 text-2xl font-bold">What learners say</h1>
+      <PageHeader title="What learners say" />
       <p className="mb-3 text-sm text-gray-700">
         Only testimonials that the author agreed to publish and that a moderator approved appear here.
       </p>
@@ -115,7 +115,7 @@ export function Feedback() {
 
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">Feedback and testimonials</h1>
+      <PageHeader title="Feedback and testimonials" />
       <ErrorBox error={err ? messageOf(err) : null} />
       <Card title="Rate a feature">
         <form onSubmit={submitRating}>

@@ -27,19 +27,31 @@ async function signInAdmin(page: Page) {
   await expect(page.getByRole("heading", { name: "Administration" })).toBeVisible();
 }
 
-test("a guest can analyse a resume against a job description without signing in", async ({ page }) => {
+test("a guest analyses side by side and gets match, skill gaps and analysis below", async ({ page }) => {
   await page.goto("/analyze");
   await expect(page.getByText(/temporary guest session/i)).toBeVisible();
-  await page.getByRole("tab", { name: "Match" }).click();
-  await expect(page.getByRole("button", { name: "Run analysis" })).toBeDisabled();
-  await page.getByLabel("Resume text").fill(RESUME);
-  await page.getByLabel("Job description text").fill(JD);
-  await page.getByRole("button", { name: "Run analysis" }).click();
+  const resume = page.getByLabel("Resume", { exact: true });
+  const jd = page.getByLabel("Job description", { exact: true });
+  const run = page.getByRole("button", { name: /Analyse and match/ });
+  await expect(run).toBeDisabled();
+  await resume.fill(RESUME);
+  await jd.fill(JD);
+
+  // layout: resume and job description share a row, the button sits below them
+  const [r, j, b] = await Promise.all([resume.boundingBox(), jd.boundingBox(), run.boundingBox()]);
+  expect(Math.abs(r!.y - j!.y)).toBeLessThan(4);
+  expect(j!.x).toBeGreaterThan(r!.x + r!.width - 4);
+  expect(b!.y).toBeGreaterThan(r!.y + r!.height);
+
+  await run.click();
   const score = page.getByLabel("Overall match score");
   await expect(score).toBeVisible();
   await expect(score).toHaveText(/\d+(\.\d+)?\/100/);
-  await expect(page.getByText(/estimate/i).first()).toBeVisible();
-  await expect(page.getByText(/Kafka/).first()).toBeVisible(); // a skill the resume lacks is reported as missing
+  await expect(page.getByRole("heading", { name: "Skill gap analysis" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Resume analysis" })).toBeVisible();
+  await expect(page.getByText(/Kafka/).first()).toBeVisible(); // a skill the resume lacks is reported
+  const top = (l: typeof run) => l.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+  expect(await top(score)).toBeGreaterThan(await top(run)); // results are below the button
 });
 
 test("visitors are sent to sign in before reaching account pages", async ({ page }) => {

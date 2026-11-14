@@ -1,8 +1,9 @@
 import { FormEvent, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { download, messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, Field, Notice, Spinner, inputCls, PageHeader } from "../components/ui";
+import { useSession } from "../store/session";
 
 interface Cert {
   certificate_id: string; certificate_type: string; title: string; learner_name: string;
@@ -22,7 +23,7 @@ export function Certificates() {
   });
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">Certificates</h1>
+      <PageHeader title="Certificates" />
       <Notice>Certificates are issued by this platform from your verified records. They are not externally accredited.</Notice>
       <ErrorBox error={issue.error ? messageOf(issue.error) : null} />
       <Card title="Available to claim">
@@ -54,6 +55,46 @@ export function Certificates() {
   );
 }
 
+
+const SAMPLES = [
+  { src: "/samples/certificate-learning.png", title: "Learning completion", how: "Finish a 7, 15 or 60 day roadmap, including every assessment it contains." },
+  { src: "/samples/certificate-assessment.png", title: "Assessment", how: "Pass an assessment. Your score is printed on the certificate." },
+  { src: "/samples/certificate-project.png", title: "Project completion", how: "Submit a GitHub project that passes the automated review." },
+];
+
+/** Illustrations only: watermarked, placeholder name, and an ID that can never verify. */
+function SampleCertificates() {
+  const user = useSession((s) => s.user);
+  return (
+    <section aria-labelledby="samples" className="mt-8">
+      <h2 id="samples" className="mb-1 text-xl font-bold">What you can earn</h2>
+      <p className="mb-4 text-sm text-slate-600">
+        Three kinds of certificate, each issued from your own verified progress. These are <b>samples</b> to show the
+        design: they are watermarked, use a placeholder name and cannot be verified.
+      </p>
+      <div className="grid gap-5 md:grid-cols-3">
+        {SAMPLES.map((c) => (
+          <figure key={c.src} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <a href={c.src} target="_blank" rel="noopener noreferrer" aria-label={`Open the sample ${c.title} certificate full size`}>
+              <img src={c.src} alt={`Sample ${c.title} certificate (not a real certificate)`} loading="lazy" className="w-full border-b border-slate-100" />
+            </a>
+            <figcaption className="p-4 text-sm">
+              <p className="font-semibold text-slate-900">{c.title}</p>
+              <p className="mt-1 text-slate-600">{c.how}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <Link to={user ? "/certificates" : "/register"} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+          {user ? "See what I can claim" : "Register and start earning yours"}
+        </Link>
+        <span className="text-xs text-slate-500">Certificates are platform-issued, not externally accredited.</span>
+      </div>
+    </section>
+  );
+}
+
 /** Public: anyone may check a certificate ID. Invalid and unknown IDs look identical. */
 export function Verify() {
   const { id } = useParams();
@@ -68,7 +109,7 @@ export function Verify() {
   const submit = (e: FormEvent) => { e.preventDefault(); if (code.trim()) nav(`/verify/${encodeURIComponent(code.trim())}`); };
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">Verify a certificate</h1>
+      <PageHeader title="Verify a certificate" />
       <form onSubmit={submit} className="mb-4 flex max-w-md gap-2">
         <input className={inputCls} aria-label="Certificate ID" placeholder="ACC-XXXX-XXXX-XXXX" value={code} onChange={(e) => setCode(e.target.value)} />
         <Button type="submit">Verify</Button>
@@ -85,6 +126,7 @@ export function Verify() {
           <p className="mt-2 text-xs text-gray-600">{q.data.notice}</p>
         </Card>
       )}
+      <SampleCertificates />
     </>
   );
 }

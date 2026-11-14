@@ -11,6 +11,8 @@ import math
 
 import pymupdf
 
+from app.services.brand import logo_png
+
 WIDTH, HEIGHT = 1200, 630
 NAVY, BLUE, GOLD, LIGHT = (0.07, 0.11, 0.24), (0.15, 0.39, 0.92), (0.98, 0.75, 0.14), (0.93, 0.95, 0.99)
 MAX_CHARS = 320
@@ -40,8 +42,9 @@ def render_card(text: str, display_name: str, rating: int | None) -> bytes:
     page.draw_rect(page.rect, color=None, fill=NAVY)
     page.draw_rect(pymupdf.Rect(0, 0, 18, HEIGHT), color=None, fill=BLUE)
 
+    page.insert_image(pymupdf.Rect(70, 36, 118, 84), stream=logo_png(192))
     page.insert_htmlbox(
-        pymupdf.Rect(70, 40, 800, 100),
+        pymupdf.Rect(132, 44, 800, 100),
         '<span style="color:#9db4ff;font-size:30px;font-weight:bold">AI Career Coach</span>')
     body = html.escape(excerpt(text))
     page.insert_htmlbox(

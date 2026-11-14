@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, Spinner, inputCls, PageHeader } from "../components/ui";
 
 interface Conversation { id: string; title: string; updated_at: string }
 interface Message { id: string; role: "user" | "assistant"; content: string; sources?: { label?: string; filename?: string }[] | null }
@@ -32,7 +32,7 @@ export default function Coach() {
 
   return (
     <>
-      <h1 className="mb-1 text-2xl font-bold">AI Career Coach</h1>
+      <PageHeader title="AI Career Coach" />
       <p className="mb-3 text-sm text-gray-700">
         Answers are grounded in your own documents. The coach cannot take actions for you (it cannot publish, apply or
         send anything).

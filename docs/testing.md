@@ -5,7 +5,7 @@
 |---|---|---|
 | Backend unit + API | `python -m pytest` (`backend/`, venv active) | 581 tests: services, routes, security, privacy, migrations on SQLite |
 | Static checks | `python -m ruff check app tests`, `python -m mypy app` (`backend/`) | lint, `mypy --strict` |
-| Frontend unit | `npm test` (`frontend/`) | 21 Vitest tests: HTTP client, guards, forms, consent, sharing, 7/15/60 |
+| Frontend unit | `npm test` (`frontend/`) | 24 Vitest tests: HTTP client, guards, forms, consent, sharing, 7/15/60 |
 | Frontend types and build | `npm run build` (`frontend/`) | `tsc --noEmit` then Vite build |
 | End to end | `npm run e2e` (`frontend/`) | 6 Playwright journeys against a real backend and a real browser |
 

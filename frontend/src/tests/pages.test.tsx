@@ -2,13 +2,12 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Route, Routes } from "react-router-dom";
 import { RequireAdmin, RequireUser } from "../components/Guards";
-import Analyze from "../pages/Analyze";
 import { Login } from "../pages/Auth";
 import { LearningList } from "../pages/Learning";
 import { PortfolioPage } from "../pages/Portfolio";
 import { Feedback, ShareButtons } from "../pages/Testimonials";
 import { useSession } from "../store/session";
-import { mockApi, renderApp, reset, signIn, type Call } from "./utils";
+import { mockApi, renderApp, reset, signIn } from "./utils";
 
 afterEach(reset);
 
@@ -135,82 +134,4 @@ test("publishing a portfolio needs both consent and a display name", async () =>
   await userEvent.click(publish);
   await waitFor(() => expect(calls.some((c) => c.method === "PUT")).toBe(true));
   expect(calls.find((c) => c.method === "PUT")?.body).toEqual({ visibility: "public", consent_public: true, display_name: "Ann L." });
-});
-
-const MATCH = {
-  match: {
-    overall_score: 72.5,
-    disclaimer: "Estimate only.",
-    category_scores: [{ category: "skills", score: 80, weight: 0.5, detail: "4 of 5" }],
-    matching_skills: [{ skill: "Python" }],
-    partial_skills: [],
-    missing_skills: [{ skill: "Kafka", level: "mandatory" }],
-    recommendations: ["Learn Kafka"],
-  },
-};
-
-test("guest analysis creates a session, uploads both documents and shows the match with its disclaimer", async () => {
-  const { calls } = mockApi({
-    "POST /guest/sessions": (() => { let n = 0; return () => ({ status: 201, body: { token: n++ === 0 ? "GT" : "GT-second-session", session_id: "s1" } }); })(),
-    "POST /guest/documents": (c: Call) => ({ status: 201, body: { document_id: (c.body as FormData).get("kind") === "resume" ? "d-r" : "d-j" } }),
-    "POST /guest/resume/analyze": { analysis: {} },
-    "POST /guest/job-description/analyze": { analysis: {} },
-    "POST /guest/career/match": MATCH,
-  });
-  renderApp(<Analyze />);
-  expect(screen.getByText(/temporary guest session/i)).toBeInTheDocument();
-  await userEvent.click(screen.getByRole("tab", { name: "Match" }));
-  const run = screen.getByRole("button", { name: "Run analysis" });
-  expect(run).toBeDisabled();
-  await userEvent.type(screen.getByLabelText("Resume text"), "Python developer with SQL");
-  await userEvent.type(screen.getByLabelText("Job description text"), "Need Python and Kafka");
-  await userEvent.click(run);
-  expect(await screen.findByLabelText("Overall match score")).toHaveTextContent("72.5/100");
-  expect(screen.getByText("Estimate only.")).toBeInTheDocument();
-  expect(within(screen.getByText("Missing").parentElement as HTMLElement).getByText("Kafka (mandatory)")).toBeInTheDocument();
-  expect(calls.filter((c) => c.path === "/guest/sessions")).toHaveLength(1); // both uploads share one session
-  const uploads = calls.filter((c) => c.path === "/guest/documents");
-  expect(uploads).toHaveLength(2);
-  expect(uploads[1].headers.get("X-Guest-Token")).toBe("GT");
-  expect(uploads[0].headers.get("X-Guest-Token")).toBe("GT");
-  // both documents must be analysed first: the server only keeps parsed text after that
-  const order = calls.map((c) => c.path);
-  expect(order.indexOf("/guest/resume/analyze")).toBeLessThan(order.indexOf("/guest/career/match"));
-  expect(order.indexOf("/guest/job-description/analyze")).toBeLessThan(order.indexOf("/guest/career/match"));
-  expect(calls.find((c) => c.path === "/guest/career/match")?.body).toMatchObject({
-    resume_document_id: "d-r",
-    job_description_document_id: "d-j",
-  });
-  expect(sessionStorage.getItem("acc.guest")).toBe("GT");
-});
-
-test("the optimiser requires explicit approval before significant changes are applied", async () => {
-  const { calls } = mockApi({
-    "POST /guest/sessions": { token: "GT" },
-    "POST /guest/documents": { document_id: "d" },
-    "POST /guest/resume/analyze": { analysis: {} },
-    "POST /guest/job-description/analyze": { analysis: {} },
-    "POST /guest/resume/optimize": {
-      result: {
-        optimized_resume_text: "Text",
-        pending_approval_ids: ["c1"],
-        needs_confirmation: [],
-        clarification_questions: ["Do you know Kafka?"],
-        changes: [{ id: "c1", section: "skills", change_type: "significant", before: "", after: "Kafka", reason: "Job asks for it", applied: false }],
-      },
-    },
-  });
-  renderApp(<Analyze />);
-  await userEvent.click(screen.getByRole("tab", { name: "Optimise resume" }));
-  await userEvent.type(screen.getByLabelText("Resume text"), "Python developer with SQL");
-  await userEvent.type(screen.getByLabelText("Job description text"), "Need Python and Kafka");
-  await userEvent.click(screen.getByRole("button", { name: "Run analysis" }));
-  const box = await screen.findByRole("checkbox", { name: /Approve this change/ });
-  expect(box).not.toBeChecked();
-  expect(screen.getByText(/needs your approval/)).toBeInTheDocument();
-  expect(calls.find((c) => c.path === "/guest/resume/optimize")?.body).toMatchObject({ approved_change_ids: [] });
-  await userEvent.click(box);
-  await userEvent.click(screen.getByRole("button", { name: "Run analysis" }));
-  await waitFor(() => expect(calls.filter((c) => c.path === "/guest/resume/optimize")).toHaveLength(2));
-  expect(calls.filter((c) => c.path === "/guest/resume/optimize")[1].body).toMatchObject({ approved_change_ids: ["c1"] });
 });

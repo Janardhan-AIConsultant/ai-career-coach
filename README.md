@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/images/logo.png" alt="AI Career Coach logo" width="120"></p>
+
 # AI Career Coach
 
 A career-development platform built from an earlier Streamlit RAG prototype: resume and job-description

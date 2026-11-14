@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { download, messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, List, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, List, Spinner, inputCls, PageHeader } from "../components/ui";
 
 interface Overview {
   users: { total: number; active: number; admins: number; new_7d: number; new_30d: number };
@@ -42,7 +42,7 @@ export function AdminHome() {
 
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">Administration</h1>
+      <PageHeader title="Administration" />
       <ErrorBox error={err ? messageOf(err) : null} />
       {ov.isLoading && <Spinner />}
       {o && (

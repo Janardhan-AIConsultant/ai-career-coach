@@ -1,6 +1,6 @@
 """Render a platform-issued certificate to PDF (A4 landscape) with logo, QR code and verification URL.
 
-The logo is vector-drawn (no image files). The QR code encodes the public verification URL and is
+The logo is rasterised from the brand SVG (``app.services.brand``). The QR code encodes the public verification URL and is
 drawn from the QR matrix as vector squares (``segno``), so no imaging libraries are needed.
 Learner-provided text is HTML-escaped. The footer always states that the certificate is issued by
 the platform and is not an externally accredited qualification.
@@ -16,6 +16,7 @@ import pymupdf
 import segno
 
 from app.core.exceptions import ReportGenerationError
+from app.services.brand import logo_png
 
 PLATFORM_NAME = "AI Career Coach"
 CATEGORY_LABEL = {
@@ -47,14 +48,7 @@ def qr_matrix(url: str) -> list[list[bool]]:
 
 
 def _draw_logo(page: pymupdf.Page, cx: float, cy: float) -> None:
-    shape = page.new_shape()
-    shape.draw_circle((cx, cy), 22)
-    shape.finish(fill=_NAVY, color=_GOLD, width=2)
-    shape.draw_polyline([(cx - 11, cy + 8), (cx, cy - 12), (cx + 11, cy + 8)])  # stylised "A"
-    shape.finish(color=(1, 1, 1), width=3, closePath=False)
-    shape.draw_line((cx - 6, cy + 1), (cx + 6, cy + 1))
-    shape.finish(color=(1, 1, 1), width=2)
-    shape.commit()
+    page.insert_image(pymupdf.Rect(cx - 24, cy - 24, cx + 24, cy + 24), stream=logo_png(192))
 
 
 def _draw_qr(page: pymupdf.Page, url: str, x: float, y: float, size: float) -> None:

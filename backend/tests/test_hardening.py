@@ -214,3 +214,18 @@ def test_deploy_artifacts_never_enable_debug_or_wildcard_cors() -> None:
             t = _text(p).lower()
             assert "cors_origins=*" not in t.replace(": ", "=").replace(" ", "")
             assert "app_env: development" not in t or p.name == "docker-compose.yml"
+
+
+def test_sample_certificate_ids_never_verify(env: Env) -> None:
+    """The ID printed on the public sample images is not a real certificate."""
+    for code in ("SAMPLE-NOT-VALID-1", "SAMPLE-NOT-VALID-2", "SAMPLE-NOT-VALID-3"):
+        assert env.client.get(f"{U}/certificates/verify/{code}").status_code == 404
+
+
+def test_brand_logo_matches_frontend_asset_and_renders() -> None:
+    from app.services.brand import LOGO_SVG, logo_png
+
+    root = Path(__file__).resolve().parents[2]
+    assert (root / "frontend" / "public" / "logo.svg").read_text(encoding="utf-8").strip() == LOGO_SVG.strip()
+    assert (root / "frontend" / "public" / "favicon.svg").read_text(encoding="utf-8").strip() == LOGO_SVG.strip()
+    assert logo_png(64).startswith(b"\x89PNG")

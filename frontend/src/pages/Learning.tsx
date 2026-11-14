@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { messageOf, request } from "../api/http";
-import { Button, Card, ErrorBox, Field, Spinner, inputCls } from "../components/ui";
+import { Button, Card, ErrorBox, Field, Spinner, inputCls, PageHeader } from "../components/ui";
 import { ROADMAP_DURATIONS } from "../lib/constants";
 
 interface Summary { id: string; title: string; duration_days: number; status: string; percent_required_complete: number }
@@ -29,7 +29,7 @@ export function LearningList() {
 
   return (
     <>
-      <h1 className="mb-3 text-2xl font-bold">Learning roadmaps</h1>
+      <PageHeader title="Learning roadmaps" />
       <Card title="Create a roadmap">
         <form onSubmit={submit}>
           <ErrorBox error={create.error ? messageOf(create.error) : null} />
