@@ -20,3 +20,6 @@ playwright-report/
 
 backend/local_dev.db
 *_dev.log
+
+# Vite dev cache
+frontend/.vite/
